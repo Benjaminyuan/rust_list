@@ -34,6 +34,14 @@ impl List {
         return None;
     }
 }
+impl Drop for List {
+    fn drop(&mut self) {
+        let mut link = std::mem::replace(&mut self.head, Link::Empty);
+        while let Link::More(mut node) = link {
+            link = std::mem::replace(&mut node.next, Link::Empty);
+        }
+    }
+}
 
 #[cfg(test)]
 mod test {
@@ -65,5 +73,9 @@ mod test {
         // Check exhaustion
         assert_eq!(list.pop(), Some(1));
         assert_eq!(list.pop(), None);
+        // test drop
+        for i in 1..100000 {
+            list.push(i);
+        }
     }
 }
